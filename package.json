@@ -1,0 +1,29 @@
+{
+  "name": "node-dyndns-server",
+  "version": "0.0.0",
+  "description": "A simple DynDNS server",
+  "main": "server.js",
+  "keywords": [
+    "dns",
+    "dynamic",
+    "dyndns",
+    "nameserver"
+  ],
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Nico Kaiser <nico@kaiser.me>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "dependencies": {
+    "bcrypt": "^0.8.1",
+    "good": "^5.1.2",
+    "good-console": "^4.1.0",
+    "hapi": "^8.2.0",
+    "hapi-auth-basic": "^2.0.0",
+    "request-ip": "0.0.4",
+    "validate-ip": "^1.0.1"
+  }
+}
