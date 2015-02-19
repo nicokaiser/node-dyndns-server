@@ -73,6 +73,29 @@ server.register([
 
     server.auth.strategy('simple', 'basic', { validateFunc: validateAuth });
 
+    server.ext('onPreResponse', function (request, reply) {
+        if (! request.response.isBoom) {
+            return reply(request.response);
+        }
+
+        request.response.output.headers['content-type'] = 'text/plain';
+        if (request.response.output.statusCode === 401) {
+            request.response.output.payload = 'noauth';
+        } else {
+            request.response.output.payload = 'err';
+        }
+
+        return reply(request.response);
+    });
+
+    server.route({
+        method: 'GET',
+        path: '/favicon.ico',
+        handler: function (request, reply) {
+            reply('err').type('text/plain').code(404);
+        }
+    });
+
     server.route({
         method: ['GET', 'POST'],
         path: '/{param*}',
