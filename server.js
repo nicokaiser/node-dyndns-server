@@ -50,7 +50,7 @@ var doUpdate = function (hostnames, myip, callback) {
     });
     commands += 'send\n';
 
-    nsupdate(config.bind.key, commands, callback);
+    nsupdate(config.bind.keyfile, commands, callback);
 };
 
 server.register([
