@@ -14,9 +14,5 @@ config.bind = {
     server: 'localhost',
     zone: 'dyn.example.com',
     ttl: 60,
-    key: {
-        name: 'ddns-key',
-        algorithm: 'hmac-sha256',
-        secret: '...'
-    }
+    keykfile: './dyn.exampe.com.key'
 };
