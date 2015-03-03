@@ -14,5 +14,5 @@ config.bind = {
     server: 'localhost',
     zone: 'dyn.example.com',
     ttl: 60,
-    keykfile: './dyn.exampe.com.key'
+    keyfile: './dyn.exampe.com.key'
 };

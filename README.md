@@ -61,7 +61,9 @@ stored in `config.js`.
 
     <user>:<password>
 
-Passwords are bcrypt'ed. Additionally, each user has a list of hosts, which they can modify (so users can update multiple hosts, and a host can be updated by multiple users).
+Passwords are bcrypt'ed. Additionally, each user has a list of hosts, which they can modify (so users can update multiple hosts, and a host can be updated by multiple users). Passwords can be encrypted like this:
+
+    require('bcrypt').hash('myspecialsecret', 10, console.log);
 
 
 ### Usage

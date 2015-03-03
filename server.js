@@ -1,3 +1,5 @@
+'use strict';
+
 var Hapi = require('hapi');
 var Good = require('good');
 var Basic = require('hapi-auth-basic');
@@ -62,7 +64,7 @@ server.register([
                 args:[{ log: '*', response: '*' }]
             }]
         }
-    },{
+    }, {
         register: Basic,
         options: {}
     }
@@ -106,7 +108,8 @@ server.register([
                 if (! validateIp(myip)) {
                     // FIXME: detect IPv6
                     myip = requestIp.getClientIp(request.raw.req);
-                    server.log('debug', 'Invalid "myip" parameter "' + request.query.myip + '" using "' + myip + '" instead');
+                    server.log('debug', 'Invalid "myip" parameter "' + request.query.myip +
+                        '" using "' + myip + '" instead');
                 }
 
                 if (! request.query.hostname) {
@@ -128,7 +131,7 @@ server.register([
                         return reply('dnserr').type('text/plain');
                     }
                     reply('good').type('text/plain');
-                })
+                });
             }
         }
     });
