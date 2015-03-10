@@ -98,6 +98,13 @@ Fragment base-64-authorization should be represented by Base 64 encoded username
 - `dnserr` DNS error encountered
 
 
+### Todo
+
+- Properly test this
+- Maybe support other protocols
+- Add IPv6 support
+
+
 ### License
 
 MIT
