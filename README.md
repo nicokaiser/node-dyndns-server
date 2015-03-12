@@ -103,6 +103,7 @@ Fragment base-64-authorization should be represented by Base 64 encoded username
 - Properly test this
 - Maybe support other protocols
 - Add IPv6 support
+- Build a Docker container to demo this
 
 
 ### License
