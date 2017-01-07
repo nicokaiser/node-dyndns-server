@@ -1,52 +1,46 @@
 'use strict';
 
-var Hapi = require('hapi');
-var Good = require('good');
-var Basic = require('hapi-auth-basic');
-var goodConsole = require('good-console');
-var bcrypt = require('bcrypt');
-var requestIp = require('request-ip');
-var validateIp = require('validate-ip');
+const Hapi = require('hapi');
+const Good = require('good');
+const Basic = require('hapi-auth-basic');
+const goodConsole = require('good-console');
+const bcrypt = require('bcrypt');
+const requestIp = require('request-ip');
+const validateIp = require('validate-ip');
 
-var nsupdate = require('./lib/nsupdate');
+const nsupdate = require('./lib/nsupdate');
+const config = require('./config');
 
-var config = require('./config');
-
-var server = new Hapi.Server();
+const server = new Hapi.Server();
 server.connection({
     port: config.port,
     host: config.host
 });
 
-var validateAuth = function (username, password, callback) {
-    var user = config.users[username];
-    if (! user) {
-        return callback(null, false);
-    }
-
-    bcrypt.compare(password, user.password, function (err, isValid) {
+const validateAuth = (username, password, callback) => {
+    const user = config.users[username];
+    if (!user) return callback(null, false);
+    return bcrypt.compare(password, user.password, (err, isValid) => {
         callback(null, isValid, {
-            username: username,
+            username,
             hosts: user.hosts
         });
     });
 };
 
-var validateHostnames = function (hostnames, userHosts) {
-    var valid = true;
-    hostnames.forEach(function (hostname) {
-        if (userHosts.indexOf(hostname) < 0) {
-            valid = false;
-        }
+const validateHostnames = (hostnames, userHosts) => {
+    let valid = true;
+    hostnames.forEach((hostname) => {
+        if (userHosts.indexOf(hostname) < 0) valid = false;
     });
     return valid;
 };
 
-var doUpdate = function (hostnames, myip, callback) {
-    var commands = 'server ' + config.bind.server + '\n';
+const doUpdate = (hostnames, myip, callback) => {
+    let commands = 'server ' + config.bind.server + '\n';
     commands += 'zone ' + config.bind.zone + '\n';
-    hostnames.forEach(function (hostname) {
-        var recType = 'A'; // FIXME: detect "AAAA"
+    hostnames.forEach((hostname) => {
+        const recType = 'A'; // FIXME: detect "AAAA"
         commands += 'update delete ' + hostname + ' ' + recType + '\n';
         commands += 'update add ' + hostname + ' ' + config.bind.ttl + ' ' + recType + ' ' + myip + '\n';
     });
@@ -61,24 +55,20 @@ server.register([
         options: {
             reporters: [{
                 reporter: goodConsole,
-                args:[{ log: '*', response: '*' }]
+                args: [{ log: '*', response: '*' }]
             }]
         }
     }, {
         register: Basic,
         options: {}
     }
-], function (err) {
-    if (err) {
-        throw err;
-    }
+], (err) => {
+    if (err) throw err;
 
     server.auth.strategy('simple', 'basic', { validateFunc: validateAuth });
 
-    server.ext('onPreResponse', function (request, reply) {
-        if (! request.response.isBoom) {
-            return reply(request.response);
-        }
+    server.ext('onPreResponse', (request, reply) => {
+        if (!request.response.isBoom) return reply(request.response);
 
         request.response.output.headers['content-type'] = 'text/plain';
         if (request.response.output.statusCode === 401) {
@@ -93,7 +83,7 @@ server.register([
     server.route({
         method: 'GET',
         path: '/favicon.ico',
-        handler: function (request, reply) {
+        handler: (request, reply) => {
             reply('err').type('text/plain').code(404);
         }
     });
@@ -103,40 +93,40 @@ server.register([
         path: '/{param*}',
         config: {
             auth: 'simple',
-            handler: function (request, reply) {
-                var myip = request.query.myip ? request.query.myip : requestIp.getClientIp(request.raw.req);
-                if (! validateIp(myip)) {
+            handler: (request, reply) => {
+                let myip = request.query.myip
+                    ? request.query.myip
+                    : requestIp.getClientIp(request.raw.req);
+                if (!validateIp(myip)) {
                     // FIXME: detect IPv6
                     myip = requestIp.getClientIp(request.raw.req);
                     server.log('debug', 'Invalid "myip" parameter "' + request.query.myip +
                         '" using "' + myip + '" instead');
                 }
 
-                if (! request.query.hostname) {
+                if (!request.query.hostname) {
                     return reply('notfqdn').type('text/plain').code(400);
                 }
-                var hostnames = request.query.hostname.split(',');
+                const hostnames = request.query.hostname.split(',');
                 if (hostnames.length < 1) {
                     return reply('notfqdn').type('text/plain').code(400);
                 }
-                if (! validateHostnames(hostnames, request.auth.credentials.hosts)) {
+                if (!validateHostnames(hostnames, request.auth.credentials.hosts)) {
                     return reply('nohost').type('text/plain').code(400);
                 }
 
                 server.log('debug', 'User: ' + request.auth.credentials.username);
                 server.log('info', 'Updating ' + hostnames + ' to ' + myip);
-                doUpdate(hostnames, myip, function (err) {
-                    if (err) {
-                        server.log('warn', err.message);
+                return doUpdate(hostnames, myip, (dnsErr) => {
+                    if (dnsErr) {
+                        server.log('warn', dnsErr.message);
                         return reply('dnserr').type('text/plain');
                     }
-                    reply('good').type('text/plain');
+                    return reply('good').type('text/plain');
                 });
             }
         }
     });
 
-    server.start(function () {
-        server.log('info', 'Server running at ' + server.info.uri);
-    });
+    server.start(() => server.log('info', 'Server running at ' + server.info.uri));
 });

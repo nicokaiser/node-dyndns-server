@@ -10,7 +10,8 @@
     "nameserver"
   ],
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "lint": "eslint server.js lib/*.js"
   },
   "author": "Nico Kaiser <nico@kaiser.me>",
   "license": "MIT",
@@ -29,5 +30,10 @@
     "hapi-auth-basic": "^2.0.0",
     "request-ip": "0.0.4",
     "validate-ip": "^1.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^3.13.0",
+    "eslint-config-airbnb-base": "^11.0.0",
+    "eslint-plugin-import": "^2.2.0"
   }
 }
