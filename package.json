@@ -23,7 +23,7 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "bcrypt": "^0.8.1",
+    "bcrypt": "^5.0.0",
     "good": "^5.1.2",
     "good-console": "^4.1.0",
     "hapi": "^8.2.0",
